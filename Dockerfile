@@ -12,8 +12,13 @@ RUN apt update \
 RUN cd /etc/fuse-native \
     && jq '.name = "fuse-native"' package.json | jq '.dependencies["napi-macros"] = "^2.2.2"' > package.temp.json \
     && mv package.temp.json package.json \
-    && yarn add --update-checksums --no-lockfile \
+    && yarn install --update-checksums --no-lockfile \
     && yarn link
+
+RUN cd /etc/fuse-shared-library-linux && \
+    jq '.name = "fuse-shared-library-linux"' package.json > package.temp.json && \
+    mv package.temp.json package.json && \
+    yarn link
 
 RUN cd /etc/xen-orchestra \
     && jq '.devDependencies["fuse-native"] = "file:/etc/fuse-native"' package.json | jq '.devDependencies["napi-macros"] = "^2.2.2"' package.json | jq '.devDependencies["fuse-shared-library-linux"] = "file:/etc/fuse-shared-library-linux"' > package.temp.json \
@@ -21,9 +26,8 @@ RUN cd /etc/xen-orchestra \
 
 RUN cd /etc/xen-orchestra/@vates/fuse-vhd \
     && jq '.dependencies["fuse-native"] = "file:/etc/fuse-native"' package.json | jq '.dependencies["napi-macros"] = "^2.2.2"' > package.temp.json \
-    && cat package.temp.json \
     && mv package.temp.json package.json \
-    && yarn add --update-checksums --no-lockfile \
+    && yarn install --update-checksums --no-lockfile \
     && yarn link "fuse-native"
 
 # Run build tasks against sources
@@ -34,7 +38,7 @@ RUN --mount=type=cache,target=/usr/local/share/.cache cd /etc/xen-orchestra \
     && yarn link "fuse-native" \
     && yarn link "fuse-shared-library-linux"
 
-RUN --mount=type=cache,target=/usr/local/share/.cache cd /etc/xen-orchestra && yarn add --verbose --update-checksums --no-lockfile
+RUN --mount=type=cache,target=/usr/local/share/.cache cd /etc/xen-orchestra && yarn install --verbose --update-checksums --no-lockfile
 RUN cd /etc/xen-orchestra \
     && yarn build \
     && yarn run turbo run build --filter @xen-orchestra/web
