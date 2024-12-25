@@ -1,0 +1,29 @@
+---
+name: XOA Arm64 Builder
+
+on:
+  push:
+    paths-ignore:
+      - 'README.md'
+      - 'docker-compose.yml'
+      - '.github/**'
+    branches:
+      - "main"
+
+jobs:
+  build:
+    runs-on: debian-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      
+
+
+  
