@@ -1,4 +1,4 @@
-FROM arm64v8/node:18-bookworm as build
+FROM arm64v8/node:18-bookworm AS build
 
 # Install set of dependencies to support building Xen Orchestra
 ENV DEBIAN_FRONTEND=noninteractive
@@ -12,7 +12,7 @@ RUN apt update \
 RUN cd /etc/fuse-native \
     && jq '.name = "fuse-native"' package.json | jq '.dependencies["napi-macros"] = "^2.2.2"' > package.temp.json \
     && mv package.temp.json package.json \
-    && yarn install --update-checksums --no-lockfile \
+    && yarn add --update-checksums --no-lockfile \
     && yarn link
 
 RUN cd /etc/xen-orchestra \
@@ -23,7 +23,7 @@ RUN cd /etc/xen-orchestra/@vates/fuse-vhd \
     && jq '.dependencies["fuse-native"] = "file:/etc/fuse-native"' package.json | jq '.dependencies["napi-macros"] = "^2.2.2"' > package.temp.json \
     && cat package.temp.json \
     && mv package.temp.json package.json \
-    && yarn install --update-checksums --no-lockfile \
+    && yarn add --update-checksums --no-lockfile \
     && yarn link "fuse-native"
 
 # Run build tasks against sources
@@ -34,7 +34,7 @@ RUN --mount=type=cache,target=/usr/local/share/.cache cd /etc/xen-orchestra \
     && yarn link "fuse-native" \
     && yarn link "fuse-shared-library-linux"
 
-RUN --mount=type=cache,target=/usr/local/share/.cache cd /etc/xen-orchestra && yarn install --verbose --update-checksums --no-lockfile
+RUN --mount=type=cache,target=/usr/local/share/.cache cd /etc/xen-orchestra && yarn add --verbose --update-checksums --no-lockfile
 RUN cd /etc/xen-orchestra \
     && yarn build \
     && yarn run turbo run build --filter @xen-orchestra/web
